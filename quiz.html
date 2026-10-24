@@ -1,0 +1,492 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebQuiz | Take Quiz</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- PDF library -->
+    <script src="https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #0b1020;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 7%;
+            border-bottom: 1px solid #263149;
+            background: #11182b;
+        }
+
+        .brand {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 22px;
+        }
+
+        .brand span { color: #9b8cff; }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .timer-badge {
+            background: #222b42;
+            border: 1px solid #37415a;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 14px;
+        }
+
+        #timer { color: #a99cff; font-weight: 800; }
+
+        .theme-btn {
+            border: 1px solid #37415a;
+            background: #222b42;
+            color: white;
+            border-radius: 10px;
+            padding: 10px 13px;
+            cursor: pointer;
+        }
+
+        .quiz-container {
+            width: min(850px, 92%);
+            margin: 45px auto;
+        }
+
+        .quiz-panel, .result-panel {
+            background: #131c30;
+            border: 1px solid #293550;
+            border-radius: 22px;
+            padding: clamp(20px, 4vw, 38px);
+            box-shadow: 0 18px 55px #0003;
+        }
+
+        .eyebrow {
+            color: #a99cff;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        h1 { font-size: clamp(25px, 4vw, 34px); font-weight: 800; }
+        h2 { font-size: clamp(19px, 3vw, 25px); font-weight: 700; line-height: 1.5; }
+        .muted-text { color: #a5b0c7; }
+
+        .quiz-topline {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .question-counter {
+            color: #d7d0ff;
+            background: #292344;
+            padding: 9px 13px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .progress-track {
+            display: flex;
+            gap: 7px;
+            margin: 25px 0 32px;
+        }
+
+        .progress-segment {
+            flex: 1;
+            height: 7px;
+            border-radius: 10px;
+            background: #303b53;
+            transition: background .2s;
+        }
+
+        .progress-segment.active { background: #9b8cff; }
+        .progress-segment.correct { background: #22c55e; }
+        .progress-segment.incorrect { background: #ef4444; }
+
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 18px;
+            color: #9ca9c2;
+            font-size: 13px;
+        }
+
+        #questionCategory {
+            color: #b9adff;
+            background: #292344;
+            border-radius: 7px;
+            padding: 6px 10px;
+        }
+
+        .answer-options {
+            display: grid;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-align: left;
+            width: 100%;
+            padding: 16px;
+            border-radius: 13px;
+            border: 1px solid #35415b;
+            background: #1a253b;
+            color: #edf1fa;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .answer-option:hover {
+            border-color: #9b8cff;
+            transform: translateY(-1px);
+        }
+
+        .answer-option.selected {
+            border-color: #9b8cff;
+            background: #292344;
+        }
+
+        .answer-option.correct {
+            border-color: #22c55e;
+            background: #123729;
+        }
+
+        .answer-option.incorrect {
+            border-color: #ef4444;
+            background: #401f2b;
+        }
+
+        .option-letter {
+            display: grid;
+            place-items: center;
+            min-width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background: #303b53;
+            font-weight: 800;
+        }
+
+        .feedback {
+            margin-top: 16px;
+            min-height: 24px;
+            color: #a5b0c7;
+            line-height: 1.6;
+        }
+
+        .quiz-navigation, .result-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+
+        .primary-btn, .secondary-btn {
+            border-radius: 11px;
+            padding: 12px 18px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .primary-btn {
+            border: none;
+            color: white;
+            background: linear-gradient(135deg, #7665ed, #a078f5);
+        }
+
+        .secondary-btn {
+            border: 1px solid #394560;
+            color: #edf1fa;
+            background: #202b42;
+        }
+
+        button:disabled { opacity: .45; cursor: not-allowed; }
+
+        .quiz-note, .quiz-footer {
+            text-align: center;
+            color: #8996af;
+            font-size: 13px;
+            margin-top: 25px;
+        }
+
+        .result-heading { text-align: center; }
+        .result-icon { font-size: 44px; margin-bottom: 12px; }
+
+        .score-card {
+            text-align: center;
+            background: #20203d;
+            border: 1px solid #403969;
+            border-radius: 17px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .score-value {
+            font-size: 48px;
+            color: #b4a6ff;
+            font-weight: 800;
+            margin: 8px 0;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            padding: 18px 8px;
+            border-radius: 13px;
+            background: #202b42;
+            color: #c4cee0;
+            font-size: 13px;
+        }
+
+        .stat-number { font-size: 27px; font-weight: 800; color: white; }
+        .correct-stat .stat-number { color: #4ade80; }
+        .wrong-stat .stat-number { color: #f87171; }
+        .unanswered-stat .stat-number { color: #fbbf24; }
+
+        .review-section { margin-top: 30px; }
+        .review-section h2 { margin-bottom: 18px; }
+
+        .review-item {
+            border: 1px solid #35415b;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .review-item p { margin: 7px 0; color: #b7c2d7; }
+        .review-correct { border-left: 4px solid #22c55e; }
+        .review-wrong { border-left: 4px solid #ef4444; }
+
+        /* Light theme */
+        body.light-theme {
+            background: #f3f5fb;
+            color: #192238;
+        }
+
+        body.light-theme .quiz-header { background: white; border-color: #e1e5ef; }
+        body.light-theme .brand { color: #192238; }
+        body.light-theme .quiz-panel,
+        body.light-theme .result-panel {
+            background: white;
+            border-color: #e1e5ef;
+        }
+
+        body.light-theme .muted-text,
+        body.light-theme .question-meta,
+        body.light-theme .quiz-note,
+        body.light-theme .quiz-footer { color: #647089; }
+
+        body.light-theme .timer-badge,
+        body.light-theme .theme-btn,
+        body.light-theme .secondary-btn {
+            background: #f0f2f9;
+            color: #192238;
+            border-color: #dce1ed;
+        }
+
+        body.light-theme .answer-option {
+            background: #f7f8fc;
+            color: #192238;
+            border-color: #dce1ed;
+        }
+
+        body.light-theme .answer-option.selected { background: #eeeaff; }
+        body.light-theme .answer-option.correct { background: #dcfce7; }
+        body.light-theme .answer-option.incorrect { background: #fee2e2; }
+        body.light-theme .option-letter { background: #e5e7f2; }
+        body.light-theme .progress-segment { background: #e1e5ef; }
+        body.light-theme .progress-segment.active { background: #8875f4; }
+        body.light-theme .progress-segment.correct { background: #22c55e; }
+        body.light-theme .progress-segment.incorrect { background: #ef4444; }
+        body.light-theme .score-card { background: #f0edff; }
+        body.light-theme .stat-card { background: #f1f3fa; color: #47536b; }
+        body.light-theme .stat-number { color: #192238; }
+        body.light-theme .review-item { border-color: #dce1ed; }
+        body.light-theme .review-item p { color: #47536b; }
+
+        @media (max-width: 560px) {
+            .quiz-header { padding: 15px 4%; }
+            .brand { font-size: 18px; }
+            .header-right { gap: 7px; }
+            .timer-badge { padding: 8px; font-size: 12px; }
+            .theme-btn { padding: 8px; }
+            .quiz-container { margin: 24px auto; }
+            .quiz-panel, .result-panel { border-radius: 16px; }
+            .quiz-navigation > button, .result-actions > button { flex: 1; }
+            .result-stats { gap: 7px; }
+            .stat-card { font-size: 11px; }
+            .stat-number { font-size: 23px; }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="quiz-header">
+        <a href="index.html" class="brand">Web<span>Quiz.</span></a>
+
+        <div class="header-right">
+            <div class="timer-badge">
+                Time left: <strong id="timer">05:00</strong>
+            </div>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">
+                ☀️ / 🌙
+            </button>
+        </div>
+    </header>
+
+    <main class="quiz-container">
+
+        <section id="quizPanel" class="quiz-panel">
+            <div class="quiz-topline">
+                <div>
+                    <p class="eyebrow">WEB TECHNOLOGIES</p>
+                    <h1>Test Your Knowledge</h1>
+                    <p class="muted-text">Answer all 5 questions and check your result.</p>
+                </div>
+                <div class="question-counter" id="progressText">Question 1 of 5</div>
+            </div>
+
+            <div
+                class="progress-track"
+                id="progressBar"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="5"
+                aria-valuenow="0"
+            >
+                <div class="progress-segment"></div>
+                <div class="progress-segment"></div>
+                <div class="progress-segment"></div>
+                <div class="progress-segment"></div>
+                <div class="progress-segment"></div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-meta">
+                    <span id="questionCategory">HTML</span>
+                    <span>Multiple Choice</span>
+                </div>
+
+                <h2 id="questionText">Loading question...</h2>
+                <div id="answerOptions" class="answer-options"></div>
+                <div id="feedback" class="feedback" aria-live="polite"></div>
+            </div>
+
+            <div class="quiz-navigation">
+                <button id="previousBtn" class="secondary-btn" type="button">← Previous</button>
+                <button id="nextBtn" class="primary-btn" type="button">Next Question →</button>
+            </div>
+
+            <p class="quiz-note">Correct answers appear in green; incorrect answers appear in red.</p>
+        </section>
+
+        <section id="resultPanel" class="result-panel" style="display:none;">
+            <div class="result-heading">
+                <div class="result-icon">🏆</div>
+                <p class="eyebrow">QUIZ COMPLETED</p>
+                <h1 id="resultHeading">Your Results</h1>
+                <p id="resultMessage" class="muted-text">Here is your performance.</p>
+            </div>
+
+            <div class="score-card">
+                <span>Your Score</span>
+                <div class="score-value" id="resultPercent">0%</div>
+                <p class="muted-text">Keep learning and improving!</p>
+            </div>
+
+            <div class="result-stats">
+                <div class="stat-card correct-stat">
+                    <span class="stat-number" id="correctCount">0</span>
+                    <span>Correct</span>
+                </div>
+                <div class="stat-card wrong-stat">
+                    <span class="stat-number" id="wrongCount">0</span>
+                    <span>Incorrect</span>
+                </div>
+                <div class="stat-card unanswered-stat">
+                    <span class="stat-number" id="unansweredCount">0</span>
+                    <span>Unanswered</span>
+                </div>
+            </div>
+
+            <div class="review-section">
+                <h2>Answer Review</h2>
+                <div id="answerReview"></div>
+            </div>
+
+            <div class="result-actions">
+                <button id="downloadPdfBtn" class="primary-btn" type="button">Download PDF Results</button>
+                <button id="restartBtn" class="secondary-btn" type="button">Restart Quiz</button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="quiz-footer">
+        Web Technologies Assignment 2 · Interactive Quiz
+    </footer>
+
+    <!-- Load PDF library before quiz JavaScript -->
+    <script src="https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+        // Keep the progress bar to five segments.
+        document.addEventListener("DOMContentLoaded", function () {
+            const bar = document.getElementById("progressBar");
+            if (bar) {
+                const segments = bar.querySelectorAll(".progress-segment");
+                segments.forEach((segment, index) => {
+                    if (index >= 5) segment.remove();
+                });
+                bar.setAttribute("aria-valuemax", "5");
+            }
+
+            const toggle = document.getElementById("themeToggle");
+            if (toggle) {
+                toggle.addEventListener("click", function () {
+                    document.body.classList.toggle("light-theme");
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,612 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Web Technologies Quiz | CSC336</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    :root {
+      --bg: #080c1c;
+      --surface: rgba(19, 27, 54, 0.88);
+      --text: #f8fafc;
+      --muted: #a9b4cf;
+      --border: rgba(148, 163, 184, 0.19);
+      --blue: #60a5fa;
+      --purple: #a78bfa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(79, 70, 229, 0.22), transparent 38%),
+        radial-gradient(ellipse at 85% 30%, rgba(124, 58, 237, 0.18), transparent 35%),
+        linear-gradient(135deg, #080c1c 0%, #11132e 48%, #15102b 100%);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .navbar-custom {
+      width: 100%;
+      min-height: 76px;
+      padding: 16px 7%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8, 12, 28, 0.62);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      color: white;
+      background: linear-gradient(135deg, #3b82f6, #9333ea);
+      box-shadow: 0 6px 22px rgba(99, 102, 241, 0.3);
+      font-size: 21px;
+    }
+
+    .brand span {
+      color: var(--blue);
+    }
+
+    .theme-toggle {
+      padding: 10px 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--purple);
+      background: rgba(167, 139, 250, 0.1);
+    }
+
+    .hero {
+      width: min(1000px, 90%);
+      margin: 0 auto;
+      padding: 78px 0 42px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 16px;
+      border: 1px solid rgba(167, 139, 250, 0.3);
+      border-radius: 50px;
+      background: rgba(124, 58, 237, 0.12);
+      color: #c4b5fd;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+    }
+
+    .hero h1 {
+      max-width: 850px;
+      margin: 25px auto 20px;
+      font-size: clamp(38px, 6.5vw, 68px);
+      line-height: 1.1;
+      font-weight: 850;
+      letter-spacing: -2px;
+    }
+
+    .gradient-text {
+      color: #a78bfa;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa, #e879f9);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-description {
+      max-width: 670px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.9;
+    }
+
+    .hero-description strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .quiz-info {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 19px;
+      margin: 43px 0 32px;
+      text-align: left;
+    }
+
+    .info-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 190px;
+      padding: 25px 23px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .info-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--card-accent);
+    }
+
+    .info-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--card-accent);
+    }
+
+    .card-blue {
+      --card-accent: #60a5fa;
+      --card-glow: rgba(59, 130, 246, 0.14);
+    }
+
+    .card-purple {
+      --card-accent: #a78bfa;
+      --card-glow: rgba(139, 92, 246, 0.15);
+    }
+
+    .card-pink {
+      --card-accent: #f472b6;
+      --card-glow: rgba(236, 72, 153, 0.14);
+    }
+
+    .info-card {
+      background:
+        radial-gradient(circle at 100% 0%, var(--card-glow), transparent 45%),
+        var(--surface);
+    }
+
+    .info-icon {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 21px;
+      border: 1px solid var(--card-accent);
+      border-radius: 15px;
+      background: var(--card-glow);
+      color: var(--card-accent);
+      font-size: 25px;
+    }
+
+    .info-card h2 {
+      margin: 0 0 9px;
+      color: var(--text);
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    .info-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .start-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-width: 225px;
+      margin-top: 5px;
+      padding: 16px 27px;
+      border: 1px solid rgba(255, 255, 255, 0.17);
+      border-radius: 14px;
+      background: linear-gradient(100deg, #2563eb, #7c3aed);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.28);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-3px);
+      color: #fff;
+      box-shadow: 0 16px 35px rgba(99, 102, 241, 0.4);
+    }
+
+    .start-arrow {
+      font-size: 20px;
+      transition: transform 0.2s ease;
+    }
+
+    .start-btn:hover .start-arrow {
+      transform: translateX(4px);
+    }
+
+    .start-note {
+      margin: 15px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .instructions {
+      width: min(850px, 90%);
+      margin: 35px auto 65px;
+      padding: 30px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--surface);
+    }
+
+    .instructions-heading {
+      margin-bottom: 22px;
+      text-align: center;
+    }
+
+    .instructions-heading span {
+      color: var(--purple);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+
+    .instructions-heading h2 {
+      margin: 9px 0 0;
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .instruction-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .instruction-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .check-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 25px;
+      height: 25px;
+      border-radius: 8px;
+      background: rgba(96, 165, 250, 0.13);
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    footer {
+      padding: 23px 15px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    footer strong {
+      color: var(--text);
+    }
+
+    /* Light theme */
+    body.light-theme {
+      --bg: #f4f6ff;
+      --surface: rgba(255, 255, 255, 0.94);
+      --text: #17203a;
+      --muted: #5b6680;
+      --border: rgba(71, 85, 105, 0.18);
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(129, 140, 248, 0.19), transparent 38%),
+        radial-gradient(ellipse at 85% 30%, rgba(192, 132, 252, 0.16), transparent 35%),
+        linear-gradient(135deg, #f8faff, #eff1ff 50%, #f8f0ff);
+    }
+
+    body.light-theme .navbar-custom {
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    body.light-theme .theme-toggle {
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    body.light-theme .eyebrow {
+      color: #6d28d9;
+    }
+
+    body.light-theme .info-card h2,
+    body.light-theme .instructions-heading h2 {
+      color: var(--text);
+    }
+
+    @media (max-width: 760px) {
+      .navbar-custom {
+        padding: 14px 5%;
+      }
+
+      .hero {
+        padding-top: 55px;
+      }
+
+      .quiz-info {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-top: 32px;
+      }
+
+      .info-card {
+        min-height: auto;
+        padding: 22px;
+      }
+
+      .info-icon {
+        margin-bottom: 16px;
+      }
+
+      .instruction-list {
+        grid-template-columns: 1fr;
+      }
+
+      .instructions {
+        padding: 23px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .brand {
+        gap: 8px;
+        font-size: 14px;
+      }
+
+      .brand-icon {
+        width: 36px;
+        height: 36px;
+      }
+
+      .theme-toggle {
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+
+      .hero h1 {
+        letter-spacing: -1px;
+      }
+
+      .hero-description {
+        font-size: 14px;
+      }
+
+      .start-btn {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="navbar-custom">
+    <a class="brand" href="index.html" aria-label="WebTech Quiz home">
+      <span class="brand-icon">✦</span>
+      <span>WEB<span>TECH</span> QUIZ</span>
+    </a>
+
+    <button
+      class="theme-toggle"
+      id="themeToggle"
+      type="button"
+      aria-label="Toggle light and dark theme"
+    >
+      ☀️ / 🌙 Theme
+    </button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">
+        <span class="status-dot"></span>
+        CSC336 · WEB TECHNOLOGIES
+      </div>
+
+      <h1>
+        Challenge Your<br>
+        <span class="gradient-text">Web Development Skills</span>
+      </h1>
+
+      <p class="hero-description">
+        Ready to test what you know about web development?
+        Take this quick interactive quiz, answer the questions,
+        and <strong>see how well you perform.</strong>
+      </p>
+
+      <div class="quiz-info">
+        <article class="info-card card-blue">
+          <div class="info-icon" aria-hidden="true">✎</div>
+          <h2>5 Questions</h2>
+          <p>
+            Five multiple-choice questions covering web development
+            fundamentals.
+          </p>
+        </article>
+
+        <article class="info-card card-purple">
+          <div class="info-icon" aria-hidden="true">◷</div>
+          <h2>1 Minute</h2>
+          <p>
+            You have 60 seconds to complete all five questions.
+            Stay focused and manage your time.
+          </p>
+        </article>
+
+        <article class="info-card card-pink">
+          <div class="info-icon" aria-hidden="true">▤</div>
+          <h2>Instant Results</h2>
+          <p>
+            Check your score, review your answers, and view
+            your result in a PDF report.
+          </p>
+        </article>
+      </div>
+
+      <a class="start-btn" href="quiz.html">
+        Start Quiz
+        <span class="start-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <p class="start-note">
+        No registration required · 5 questions · 60 seconds
+      </p>
+    </section>
+
+    <section class="instructions">
+      <div class="instructions-heading">
+        <span>Before You Begin</span>
+        <h2>How the Quiz Works</h2>
+      </div>
+
+      <ul class="instruction-list">
+        <li>
+          <span class="check-icon">✓</span>
+          <span>Answer all 5 multiple-choice questions.</span>
+        </li>
+
+        <li>
+          <span class="check-icon">✓</span>
+          <span>The countdown starts at 01:00 when the quiz begins.</span>
+        </li>
+
+        <li>
+          <span class="check-icon">✓</span>
+          <span>Move between questions using the navigation buttons.</span>
+        </li>
+
+        <li>
+          <span class="check-icon">✓</span>
+          <span>When time ends, your quiz results are calculated.</span>
+        </li>
+
+        <li>
+          <span class="check-icon">✓</span>
+          <span>Review correct and incorrect answers after finishing.</span>
+        </li>
+
+        <li>
+          <span class="check-icon">✓</span>
+          <span>Open your result report to print or save it as a PDF.</span>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <strong>CSC336 · Web Technologies</strong>
+    <span> | Assignment 2 · Fall 2026</span>
+  </footer>
+
+  <script>
+    const themeToggle = document.getElementById("themeToggle");
+
+    // Restore the selected theme if browser storage is available.
+    try {
+      if (localStorage.getItem("quizTheme") === "light") {
+        document.body.classList.add("light-theme");
+      }
+    } catch (error) {
+      // The page still works if local storage is unavailable.
+    }
+
+    themeToggle.addEventListener("click", function () {
+      document.body.classList.toggle("light-theme");
+
+      try {
+        const selectedTheme =
+          document.body.classList.contains("light-theme")
+            ? "light"
+            : "dark";
+
+        localStorage.setItem("quizTheme", selectedTheme);
+      } catch (error) {
+        // Theme switching still works for this page.
+      }
+    });
+  </script>
+</body>
+</html>
